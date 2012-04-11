@@ -20,7 +20,7 @@ OAuth2::OAuth2()
 
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
     m_strScope = "https://www.googleapis.com/auth/tasks"; //Access to Tasks service
-    m_strClientID = "YOU_CLIENT_ID_HERE";
+    m_strClientID = "YOUR_CLIENT_ID_HERE";
     m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
     m_strResponseType = "token";
 }
