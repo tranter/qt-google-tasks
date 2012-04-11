@@ -6,8 +6,6 @@
 
 OAuth2::OAuth2()
 {
-    //property string oauth_link: "https://accounts.google.com/o/oauth2/auth?&client_id=476807742904-1e2qesck2a151t6envel2756heus7ddt.apps.googleusercontent.com&redirect_uri=http://www.ics.com/oauth2callback&response_type=token&scope=https://www.googleapis.com/auth/books"
-
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
     m_strScope = "https://www.googleapis.com/auth/tasks"; //Access to Tasks service
     m_strClientID = "YOU_CLIEND_ID_HERE";
