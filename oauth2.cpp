@@ -53,7 +53,7 @@ void OAuth2::startLogin(QWidget* parent, bool bForce)
     if(m_strClientID == "YOUR_CLIENT_ID_HERE" || m_strRedirectURI == "YOUR_REDIRECT_URI_HERE")
     {
         QMessageBox::warning(parent, "Warning",
-                             "To work with application you need to register your own application in <b>Google</b>\n"
+                             "To work with application you need to register your own application in <b>Google</b>.\n"
                              "Learn more from <a href='http://code.google.com/p/qt-google-tasks/wiki/HowToRegisterYourAppIicationInGoogle'>here</a>");
         return;
     }
