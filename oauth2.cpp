@@ -2,13 +2,25 @@
 #include <QDebug>
 #include <QApplication>
 #include <QSettings>
+#include <QMessageBox>
 #include "logindialog.h"
 
 OAuth2::OAuth2()
 {
+    //You need to login to Google, so first you need to create simple
+    //Google account. Then you can visit the page
+    //
+    // https://code.google.com/apis/console
+    //
+    //there you can create your application. You need to check access to Tasks API.
+    //
+    //Then  you can see credentials of your application.
+    //You need to copy and paste Client_ID and Redirect_URI to the strings below.
+    //
+
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
     m_strScope = "https://www.googleapis.com/auth/tasks"; //Access to Tasks service
-    m_strClientID = "YOU_CLIEND_ID_HERE";
+    m_strClientID = "YOU_CLIENT_ID_HERE";
     m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
     m_strResponseType = "token";
 }
@@ -38,6 +50,13 @@ void OAuth2::startLogin(QWidget* parent, bool bForce)
     QString str = settings.value("access_token", "").toString();
 
     qDebug() << "OAuth2::startLogin, token from Settings" << str;
+    if(m_strClientID == "YOUR_CLIENT_ID_HERE" || m_strRedirectURI == "YOUR_REDIRECT_URI_HERE")
+    {
+        QMessageBox::warning(parent, "Warning",
+                             "To work with application you need to register your own application in <b>Google</b>\n"
+                             "Learn more from <a href='http://code.google.com/p/qt-google-tasks/wiki/HowToRegisterYourAppIicationInGoogle'>here</a>");
+        return;
+    }
 
     if(str.isEmpty() || bForce)
     {
