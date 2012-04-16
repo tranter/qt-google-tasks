@@ -128,6 +128,7 @@ void TasksDataManager::moveTask(const QString& access_token, const QString& task
     QByteArray params;
     QNetworkRequest request;
     request.setUrl(QUrl(s));
+    request.setRawHeader("Content-Type", "application/json");
     m_pNetworkAccessManager->post(request, params);
 }
 
@@ -197,6 +198,7 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
                 QByteArray params;
                 QNetworkRequest request;
                 request.setUrl(QUrl(m_moveRequests[ind+1]));
+                request.setRawHeader("Content-Type", "application/json");
                 m_pNetworkAccessManager->post(request, params);
             }
             qDebug() << "Not Last move request!!!";
@@ -240,6 +242,7 @@ void TasksDataManager::endMoving()
         QByteArray params;
         QNetworkRequest request;
         request.setUrl(QUrl(m_moveRequests[i]));
+        request.setRawHeader("Content-Type", "application/json");
         m_pNetworkAccessManager->post(request, params);
         if(i == 0)
             break;
