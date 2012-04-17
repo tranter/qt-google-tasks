@@ -55,7 +55,7 @@ void Form::loadLists()
 {
     disconnect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(loadTasks()));
     disconnect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem* )), this, SLOT(showTaskInfo()));
-    disconnect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged()));
+    disconnect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged(QTreeWidgetItem*, int)));
 
 
     //ui->tasksListWidget->clear();
@@ -86,7 +86,7 @@ void Form::getTaskListsFromManager()
 
 void Form::getTasksFromManager()
 {
-    disconnect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged()));
+    disconnect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged(QTreeWidgetItem*, int)));
 
     int sel_row = getCurrentTaskIndex();
     QString selID = "";
@@ -155,7 +155,7 @@ void Form::getTasksFromManager()
         }
     }
 
-    connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged()));
+    connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged(QTreeWidgetItem*, int)));
 
 
 }
@@ -327,15 +327,20 @@ void Form::updateTask()
     m_tasksDataManager.updateTask(m_oauth2.accessToken(), taskListID, taskID, json_object);
 }
 
-void Form::taskItemChanged()
+void Form::taskItemChanged(QTreeWidgetItem * item, int column)
 {
-    int index = getCurrentTaskIndex();
-    QTreeWidgetItem* item = ui->treeWidget->currentItem();
-    if(index == -1)
-    {
-        QMessageBox::warning(this, tr("Warning"), tr("No selected task."));
-        return;
-    }
+    if( column != 0 ) return;
+
+    //int index = getCurrentTaskIndex();
+    //QTreeWidgetItem* item = ui->treeWidget->currentItem();
+    //if(index == -1)
+    //{
+    //    QMessageBox::warning(this, tr("Warning"), tr("No selected task."));
+    //    return;
+    //}
+
+    int index = item->data(0, Qt::UserRole).toInt();
+
     QString taskID = m_tasks[index].toMap()["id"].toString();
     QVariantMap json_object = m_tasks[index].toMap();
 
@@ -381,7 +386,7 @@ void Form::deleteList()
     }
     QString taskListID = m_taskLists[index].toMap()["id"].toString();
     m_tasksDataManager.deleteList(m_oauth2.accessToken(), taskListID);
-
+    ui->treeWidget->clear();
 }
 
 int Form::getCurrentTaskIndex()
@@ -610,7 +615,7 @@ void Form::downClicked()
     QString taskID   = m_tasks[index].toMap()["id"].toString();
     QString parentID = m_tasks[index].toMap()["parent"].toString();
 
-    int count = 0;
+    //int count = 0;
     QString nextID = "";
     for(int i = index+1; i < m_tasks.count(); ++i)
     {

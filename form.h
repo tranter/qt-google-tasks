@@ -43,7 +43,7 @@ private slots:
     void upClicked();
     void downClicked();
 
-    void taskItemChanged();
+    void taskItemChanged(class QTreeWidgetItem * item, int column);
 
 private:
     int getCurrentTaskIndex();
