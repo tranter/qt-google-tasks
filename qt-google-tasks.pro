@@ -16,8 +16,18 @@ linux* {
 LIBS += ../qjson/build/lib/libqjson.so
 }
 
-win* {
-LIBS += ../qjson/build/lib/qjson0.dll
+win32-g++ {
+    #MinGW compiler for Windows
+    message(Configured for Windows (Qt Version: $$QT_VERSION; $$QMAKE_CC))
+
+    LIBS += ../qjson/build/lib/qjson0.dll
+}
+
+win32-msvc* {
+    #MSVC compiler for Windows
+    message(Configured for Windows (Qt Version: $$QT_VERSION; $$QMAKE_CC))
+
+    LIBS += ../qjson/build/lib/qjson0.lib
 }
 
 macx* {
