@@ -60,6 +60,7 @@ void Form::loadLists()
 
     //ui->tasksListWidget->clear();
     ui->listWidget->clear();
+    ui->treeWidget->clear();
 
     m_tasksDataManager.getMyTaskLists(m_oauth2.accessToken());
 

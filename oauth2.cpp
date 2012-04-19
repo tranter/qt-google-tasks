@@ -26,10 +26,12 @@ OAuth2::OAuth2(QWidget* parent)
 
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
     m_strScope = "https://www.googleapis.com/auth/tasks"; //Access to Tasks service
+
     m_strClientID = "YOUR_CLIENT_ID_HERE";
     m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";
     m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
     m_strCompanyName = "YOU_COMPANY_NAME_HERE";
+
     m_strAppName = "QtTasks";
     m_strResponseType = "code";
 
