@@ -1,15 +1,24 @@
-#include "form.h"
-#include "ui_form.h"
-
-#include <QDebug>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QSettings>
+
+#include "form.h"
+#include "ui_form.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Form)
 {
     ui->setupUi(this);
+
+    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
+    m_strAppName = "QtTasks";
+
+    // Load settings
+    m_pSettings = new QSettings(m_strCompanyName, m_strAppName);
+    m_oauth2.setAccessToken(m_pSettings->value("access_token").toString());
+    m_oauth2.setRefreshToken(m_pSettings->value("refresh_token").toString());
+    m_oauth2.setSettings(m_pSettings);
 
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(loadTasks()));
     //connect(ui->tasksListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showTaskInfo()));
@@ -27,6 +36,7 @@ Form::Form(QWidget *parent) :
     connect(ui->newListButton, SIGNAL(clicked()), this, SLOT(newList()));
 
 
+    connect(&m_oauth2, SIGNAL(sigErrorOccured(QString)),this,SLOT(errorOccured(QString)));
     connect(&m_oauth2, SIGNAL(loginDone()), this, SLOT(loadLists()));
 
     connect(&m_tasksDataManager, SIGNAL(taskListsReady()), this, SLOT(getTaskListsFromManager()));
@@ -38,6 +48,8 @@ Form::Form(QWidget *parent) :
 
 Form::~Form()
 {
+    saveSettings();
+    delete m_pSettings;
     delete ui;
 }
 
@@ -63,12 +75,10 @@ void Form::loadLists()
     ui->treeWidget->clear();
 
     m_tasksDataManager.getMyTaskLists(m_oauth2.accessToken());
-
 }
 
 void Form::getTaskListsFromManager()
 {
-    qDebug() << "Form::getTaskListsFromManager";
     m_taskLists = m_tasksDataManager.getTaskLists();
     QStringList lst;
     for(int i = 0; i < m_taskLists.count(); ++i)
@@ -78,11 +88,8 @@ void Form::getTaskListsFromManager()
     ui->listWidget->clear();
     ui->listWidget->addItems(lst);
 
-    //ui->tasksListWidget->clear();
-
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(loadTasks()));
     connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem* )), this, SLOT(showTaskInfo()));
-
 }
 
 void Form::getTasksFromManager()
@@ -142,11 +149,6 @@ void Form::getTasksFromManager()
     ui->treeWidget->insertTopLevelItems(0, items);
     ui->treeWidget->expandAll();
 
-//    if(sel_row != -1 && sel_row < items.count())
-//    {
-//        ui->treeWidget->setCurrentItem(items[sel_row]);
-//    }
-
     for(int i = 0; i < m_tasks.count(); ++i)
     {
         if(m_tasks[i].toMap()["id"].toString() == selID)
@@ -157,8 +159,6 @@ void Form::getTasksFromManager()
     }
 
     connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged(QTreeWidgetItem*, int)));
-
-
 }
 
 void Form::errorOccured(const QString& error)
@@ -177,7 +177,6 @@ void Form::loadTasks()
 {
     int index = ui->listWidget->currentRow();
     QString  taskListID = m_taskLists[index].toMap()["id"].toString();
-    qDebug() << "taskListID" << taskListID;
     m_tasksDataManager.getMyTasks(m_oauth2.accessToken(), taskListID);
 }
 
@@ -186,7 +185,6 @@ void Form::showTaskInfo()
     int index = getCurrentTaskIndex();
     if(index == -1)
     {
-        //QMessageBox::warning(this, tr("Warning"), tr("No selected task."));
         ui->taskCheckBox->setText("");
         ui->taskCheckBox->setCheckState(Qt::Unchecked);
         ui->notesTextEdit->setPlainText("");
@@ -217,9 +215,7 @@ void Form::showTaskInfo()
         ui->dueDateEdit->setDate(date);
         ui->dueDateCheckBox->setChecked(true);
     }
-    //ui->dueDateLineEdit->setText(m_tasks[index].toMap()["due"].toString());
 }
-
 
 void Form::deleteTask()
 {
@@ -243,7 +239,6 @@ void Form::deleteTask()
 
 void Form::newTask()
 {
-    qDebug() << "newTask";
     QString strTitle = QInputDialog::getText(this, "Create new task", "Task name");
     if(strTitle.isEmpty())
     {
@@ -282,9 +277,7 @@ void Form::newTask()
         }
     }
 
-
     m_tasksDataManager.createTask(m_oauth2.accessToken(), taskListID, strTitle, prevTaskID, parentID);
-
 }
 
 void Form::updateTask()
@@ -332,14 +325,6 @@ void Form::taskItemChanged(QTreeWidgetItem * item, int column)
 {
     if( column != 0 ) return;
 
-    //int index = getCurrentTaskIndex();
-    //QTreeWidgetItem* item = ui->treeWidget->currentItem();
-    //if(index == -1)
-    //{
-    //    QMessageBox::warning(this, tr("Warning"), tr("No selected task."));
-    //    return;
-    //}
-
     int index = item->data(0, Qt::UserRole).toInt();
 
     QString taskID = m_tasks[index].toMap()["id"].toString();
@@ -374,7 +359,6 @@ void Form::newList()
         return;
     }
     m_tasksDataManager.createList(m_oauth2.accessToken(), strTitle);
-
 }
 
 void Form::deleteList()
@@ -425,7 +409,6 @@ void Form::leftClicked()
         //Cannot move left!
         return;
     }
-    qDebug() << "parentID" << parentID;
     QString newParentID = "";
     QString newParentTitle = "";
     for(int i = 0; i < index; ++i)
@@ -436,7 +419,6 @@ void Form::leftClicked()
             break;
         }
     }
-    qDebug() << "New parentID" << newParentTitle << newParentID;
     QString prevID = "";
     for(int i = 0; i < index; ++i)
     {
@@ -446,11 +428,7 @@ void Form::leftClicked()
         }
     }
 
-
-
-
     m_tasksDataManager.startMoving();
-
     m_tasksDataManager.moveTask(m_oauth2.accessToken(), taskListID, taskID, prevID, newParentID);
 
 ////    IMPORTANT!!!
@@ -500,7 +478,6 @@ void Form::rightClicked()
             newParentID = m_tasks[i].toMap()["id"].toString();
         }
     }
-
 
     if(newParentID.isEmpty())
     {
@@ -594,7 +571,6 @@ void Form::upClicked()
             m_tasksDataManager.endMoving();
         }
     }
-
 }
 
 void Form::downClicked()
@@ -616,7 +592,6 @@ void Form::downClicked()
     QString taskID   = m_tasks[index].toMap()["id"].toString();
     QString parentID = m_tasks[index].toMap()["parent"].toString();
 
-    //int count = 0;
     QString nextID = "";
     for(int i = index+1; i < m_tasks.count(); ++i)
     {
@@ -660,4 +635,8 @@ void Form::downClicked()
 
 }
 
-
+void Form::saveSettings()
+{
+    m_pSettings->setValue("access_token",m_oauth2.accessToken());
+    m_pSettings->setValue("refresh_token",m_oauth2.refreshToken());
+}

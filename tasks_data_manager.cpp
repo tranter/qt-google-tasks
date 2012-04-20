@@ -1,5 +1,4 @@
 #include "tasks_data_manager.h"
-#include <QDebug>
 #include <QRegExp>
 #include <QJson/Parser>
 #include <QJson/Serializer>
@@ -26,14 +25,12 @@ QVariantList TasksDataManager::getTasks()
 
 void TasksDataManager::getMyTaskLists(const QString& access_token)
 {
-    qDebug() << "TasksDataManager::getMyTaskLists";
     QString s = QString("https://www.googleapis.com/tasks/v1/users/@me/lists?&access_token=%1").arg(access_token);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
 void TasksDataManager::getMyTasks(const QString& access_token, const QString& taskListID)
 {
-    qDebug() << "TasksDataManager::getMyTasks";
     QString s = QString("https://www.googleapis.com/tasks/v1/lists/%1/tasks?&access_token=%2").arg(taskListID).arg(access_token);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
@@ -52,11 +49,8 @@ void TasksDataManager::createList(const QString& access_token, const QString& ti
 void TasksDataManager::deleteList(const QString& access_token, const QString& taskListID)
 {
     QString s = QString("https://www.googleapis.com/tasks/v1/users/@me/lists/%1?access_token=%2").arg(taskListID).arg(access_token);
-    qDebug() << "deleteList" << s;
     m_pNetworkAccessManager->deleteResource(QNetworkRequest(QUrl(s)));
-
 }
-
 
 void TasksDataManager::deleteTask(const QString& access_token, const QString& taskListID, const QString& taskID)
 {
@@ -89,7 +83,6 @@ void TasksDataManager::createTask(const QString& access_token, const QString& ta
 
 void TasksDataManager::updateTask(const QString& access_token, const QString& taskListID, const QString& taskID, const QVariant& json_object)
 {
-    qDebug() << "TasksDataManager::updateTask";
     QString s = QString("https://www.googleapis.com/tasks/v1/lists/%1/tasks/%2?access_token=%3").arg(taskListID).arg(taskID).arg(access_token);
 
     QJson::Serializer serializer;
@@ -99,7 +92,6 @@ void TasksDataManager::updateTask(const QString& access_token, const QString& ta
     request.setUrl(QUrl(s));
     request.setRawHeader("Content-Type", "application/json");
     m_pNetworkAccessManager->put(request, params);
-
 }
 
 void TasksDataManager::moveTask(const QString& access_token, const QString& taskListID, const QString& taskID,
@@ -118,7 +110,6 @@ void TasksDataManager::moveTask(const QString& access_token, const QString& task
         s += QString("&parent=%1").arg(parentID);
     }
 
-    //qDebug() << "moveTask" << s;
     if(m_bInMoving)
     {
         m_moveRequests.append(s);
@@ -136,24 +127,19 @@ void TasksDataManager::moveTask(const QString& access_token, const QString& task
 void TasksDataManager::replyFinished(QNetworkReply *reply)
 {
     QString json = reply->readAll();
-    //qDebug() << "Reply = " << json;
-    //qDebug() << "URL = " << reply->url();
     QString strUrl = reply->url().toString();
 
     //Empty answer usually after creting task or list!
     if(json.length() == 0)
     {
-        qDebug() << "Empty answer";
         //Deletion of lists or tasks
         QRegExp reg("lists/*/tasks", Qt::CaseSensitive, QRegExp::Wildcard);
         if(strUrl.indexOf(reg) != -1)
         {
-            qDebug() << "Emit taskChanged()";
             emit taskChanged();
         }
         else
         {
-            qDebug() << "Emit listsChanged()";
             emit listsChanged();
         }
         return;
@@ -166,14 +152,12 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
     QVariant result = parser.parse (json.toLatin1(), &ok);
     if(!ok)
     {
-        qDebug() << "ERROR occured:\n" << strUrl;
         emit errorOccured(QString("Cannot convert to QJson object: %1").arg(json));
         return;
     }
 
     if(result.toMap().contains("error"))
     {
-        qDebug() << "ERROR occured:\n";// << strUrl;
         emit errorOccured(result.toMap()["error"].toMap()["message"].toString());
         return;
     }
@@ -181,11 +165,8 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
 
     if(strUrl.indexOf("/move") != -1)
     {
-//        emit taskChanged();
-//        return;
         if(strUrl == m_strLastMoveRequest)
         {
-            qDebug() << "Last Move request ended!!!";
             m_moveRequests.clear();
             emit taskChanged();
             return;
@@ -201,11 +182,9 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
                 request.setRawHeader("Content-Type", "application/json");
                 m_pNetworkAccessManager->post(request, params);
             }
-            qDebug() << "Not Last move request!!!";
             return;
         }
     }
-
 
     if(result.toMap()["kind"] == "tasks#taskLists")
     {
@@ -229,14 +208,12 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
 
 void TasksDataManager::startMoving()
 {
-    //m_moveRequests.clear();
     m_bInMoving = true;
 }
 
 void TasksDataManager::endMoving()
 {
     m_bInMoving = false;
-    qDebug() << "END MOVING:\n\n";
     for(int i = 0; i < m_moveRequests.count(); ++i)
     {
         QByteArray params;
@@ -255,7 +232,6 @@ void TasksDataManager::endMoving()
     {
         m_strLastMoveRequest = "";
     }
-    //m_moveRequests.clear();
 }
 
 

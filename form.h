@@ -47,6 +47,7 @@ private slots:
 
 private:
     int getCurrentTaskIndex();
+    void saveSettings();
 
 
 private:
@@ -55,6 +56,10 @@ private:
     QVariantList m_taskLists;
     QVariantList m_tasks;
     TasksDataManager m_tasksDataManager;
+
+    QSettings* m_pSettings;
+    QString m_strCompanyName;
+    QString m_strAppName;
 };
 
 #endif // FORM_H

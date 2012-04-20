@@ -7,6 +7,7 @@
 class LoginDialog;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QSettings;
 
 class OAuth2 : public QObject
 {
@@ -14,22 +15,27 @@ class OAuth2 : public QObject
 
 public:
     OAuth2(QWidget* parent = 0);
-    QString accessToken();
     bool isAuthorized();
     void startLogin(QWidget* parent, bool bForce);
 
     QString loginUrl();
+    QString permanentLoginUrl();
+
+    QString accessToken() {return m_strAccessToken;}
+    void setAccessToken(const QString& access_token) {m_strAccessToken = access_token;}
+    QString refreshToken() { return m_strRefreshToken; }
+    void setRefreshToken(const QString& refresh_token) {m_strRefreshToken = refresh_token;}
+
+    void setSettings(QSettings* p) {m_pSettings = p;}
 
 signals:
     void loginDone();
-    void errorOccured(const QString&);
+    void sigErrorOccured(const QString&);
 
 private slots:
     void accessTokenObtained();
     void codeObtained();
     void replyFinished(QNetworkReply*);
-
-private:
     void getAccessTokenFromRefreshToken();
 
 private:
@@ -42,14 +48,11 @@ private:
     QString m_strClientID;
     QString m_strClientSecret;
     QString m_strRedirectURI;
-    QString m_strResponseType;
-
-    QString m_strCompanyName;
-    QString m_strAppName;
 
     LoginDialog* m_pLoginDialog;
     QWidget* m_pParent;
 
+    QSettings* m_pSettings;
     QNetworkAccessManager * m_pNetworkAccessManager;
 };
 

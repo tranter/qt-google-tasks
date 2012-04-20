@@ -1,5 +1,4 @@
 #include "tree_widget.h"
-#include <QDebug>
 
 TreeWidget::TreeWidget(QWidget *parent) :
     QTreeWidget(parent)
