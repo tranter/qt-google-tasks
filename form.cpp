@@ -39,6 +39,7 @@ Form::Form(QWidget *parent) :
     connect(&m_oauth2, SIGNAL(sigErrorOccured(QString)),this,SLOT(errorOccured(QString)));
     connect(&m_oauth2, SIGNAL(loginDone()), this, SLOT(loadLists()));
 
+    connect(&m_tasksDataManager, SIGNAL(sigUserEmailReady()), this, SLOT(onUserEmailReady()));
     connect(&m_tasksDataManager, SIGNAL(taskListsReady()), this, SLOT(getTaskListsFromManager()));
     connect(&m_tasksDataManager, SIGNAL(tasksReady()),  this, SLOT(getTasksFromManager()));
     connect(&m_tasksDataManager, SIGNAL(errorOccured(QString)), this, SLOT(errorOccured(QString)));
@@ -63,8 +64,9 @@ void Form::startLogin(bool bForce)
 }
 
 
-void Form::loadLists()
+void Form::onUserEmailReady()
 {
+    ui->userEmail->setText(m_tasksDataManager.userEmail());
     disconnect(ui->listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(loadTasks()));
     disconnect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem* )), this, SLOT(showTaskInfo()));
     disconnect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(taskItemChanged(QTreeWidgetItem*, int)));
@@ -75,6 +77,11 @@ void Form::loadLists()
     ui->treeWidget->clear();
 
     m_tasksDataManager.getMyTaskLists(m_oauth2.accessToken());
+}
+
+void Form::loadLists()
+{
+    m_tasksDataManager.getUserEmail(m_oauth2.accessToken());
 }
 
 void Form::getTaskListsFromManager()

@@ -42,6 +42,7 @@ private slots:
     void rightClicked();
     void upClicked();
     void downClicked();
+    void onUserEmailReady();
 
     void taskItemChanged(class QTreeWidgetItem * item, int column);
 

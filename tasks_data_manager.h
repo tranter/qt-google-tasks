@@ -27,11 +27,13 @@ public:
     void deleteList(const QString& access_token, const QString& taskListID);
     void moveTask(const QString& access_token, const QString& taskListID, const QString& taskID,
                   const QString& prevTaskID,   const QString& parentID);
+    void getUserEmail(const QString& access_token);
 
 
     //Getting currently read taskLists and tasks.
     QVariantList getTaskLists();
     QVariantList getTasks();
+    QString userEmail() {return m_strUserEmail;}
 
     void startMoving();
     void endMoving();
@@ -42,8 +44,7 @@ signals:
     void errorOccured(const QString& error);
     void taskChanged();
     void listsChanged();
-
-
+    void sigUserEmailReady();
 
 private slots:
     void replyFinished(QNetworkReply*);
@@ -58,6 +59,7 @@ private:
     //Flag that shows that there are several move requests to be done. While moving, we do not send
     //taskChanged() signals, only accumulate requests.
     bool m_bInMoving;
+    QString m_strUserEmail;
 
 };
 

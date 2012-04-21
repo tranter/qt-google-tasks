@@ -25,7 +25,9 @@ OAuth2::OAuth2(QWidget* parent)
     //
 
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
-    m_strScope = "https://www.googleapis.com/auth/tasks"; //Access to Tasks service
+    m_strScope = "https://www.googleapis.com/auth/tasks"
+            "+https://www.googleapis.com/auth/userinfo.email"
+            ; //Access to Tasks service
 
     m_strClientID = "YOUR_CLIENT_ID_HERE";
     m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";

@@ -123,6 +123,13 @@ void TasksDataManager::moveTask(const QString& access_token, const QString& task
     m_pNetworkAccessManager->post(request, params);
 }
 
+void TasksDataManager::getUserEmail(const QString& access_token)
+{
+    QString query = QString("https://www.googleapis.com/oauth2/v1/userinfo"
+                            "?access_token=%1")
+            .arg(access_token);
+    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(query)));
+}
 
 void TasksDataManager::replyFinished(QNetworkReply *reply)
 {
@@ -161,7 +168,6 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
         emit errorOccured(result.toMap()["error"].toMap()["message"].toString());
         return;
     }
-
 
     if(strUrl.indexOf("/move") != -1)
     {
@@ -203,6 +209,10 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
     else if(result.toMap()["kind"] == "tasks#taskList") //New created list
     {
         emit listsChanged();
+    } else if (strUrl.contains("userinfo")) {
+        m_strUserEmail = result.toMap()["email"].toString();
+        emit sigUserEmailReady();
+        return;
     }
 }
 
