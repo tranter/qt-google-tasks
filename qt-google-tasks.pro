@@ -1,11 +1,5 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2012-01-08T21:31:53
-#
-#-------------------------------------------------
-
 QT       += core gui webkit network
-
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 TARGET = qttasks
 TEMPLATE = app
