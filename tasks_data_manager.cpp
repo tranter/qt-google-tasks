@@ -156,7 +156,14 @@ void TasksDataManager::replyFinished(QNetworkReply *reply)
     bool ok;
 
     // json is a QString containing the data to convert
+#if QT_VERSION >= 0x050000
+    // Qt5 code
+    QVariant result = parser.parse (json.toUtf8(), &ok);
+#else
+    // Qt4 code
     QVariant result = parser.parse (json.toLatin1(), &ok);
+#endif
+
     if(!ok)
     {
         emit errorOccured(QString("Cannot convert to QJson object: %1").arg(json));
