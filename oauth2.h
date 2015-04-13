@@ -39,6 +39,9 @@ private slots:
     void getAccessTokenFromRefreshToken();
 
 private:
+    void getAppInfoFromSettings();
+
+private:
     QString m_strAccessToken;
     QString m_strRefreshToken;
     QString m_strCode;

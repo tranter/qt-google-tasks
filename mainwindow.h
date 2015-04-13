@@ -20,6 +20,7 @@ public:
 
 public slots:
     void startLogin();
+    void settings();
 
 private:
     Ui::MainWindow *ui;

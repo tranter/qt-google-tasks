@@ -4,6 +4,7 @@
 
 #include "form.h"
 #include "ui_form.h"
+#include "registration.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -11,11 +12,9 @@ Form::Form(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
-    m_strAppName = "QtTasks";
 
     // Load settings
-    m_pSettings = new QSettings(m_strCompanyName, m_strAppName);
+    m_pSettings = new QSettings(COMPANY_NAME, APP_NAME);
     m_oauth2.setAccessToken(m_pSettings->value("access_token").toString());
     m_oauth2.setRefreshToken(m_pSettings->value("refresh_token").toString());
     m_oauth2.setSettings(m_pSettings);

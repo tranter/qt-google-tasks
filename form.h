@@ -59,8 +59,6 @@ private:
     TasksDataManager m_tasksDataManager;
 
     QSettings* m_pSettings;
-    QString m_strCompanyName;
-    QString m_strAppName;
 };
 
 #endif // FORM_H

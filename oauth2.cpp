@@ -10,6 +10,7 @@
 
 #include "oauth2.h"
 #include "logindialog.h"
+#include "registration.h"
 
 OAuth2::OAuth2(QWidget* parent)
 {
@@ -29,9 +30,8 @@ OAuth2::OAuth2(QWidget* parent)
             "+https://www.googleapis.com/auth/userinfo.email"
             ; //Access to Tasks service
 
-    m_strClientID = "YOUR_CLIENT_ID_HERE";
-    m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";
-    m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
+    getAppInfoFromSettings();
+
 
     m_pLoginDialog = NULL;
     m_pParent = parent;
@@ -44,6 +44,8 @@ OAuth2::OAuth2(QWidget* parent)
 
 QString OAuth2::loginUrl()
 {
+    getAppInfoFromSettings();
+
     QString str = QString("%1?client_id=%2&redirect_uri=%3&response_type=token&scope=%4")
             .arg(m_strEndPoint,m_strClientID,m_strRedirectURI,m_strScope);
     return str;
@@ -51,6 +53,8 @@ QString OAuth2::loginUrl()
 
 QString OAuth2::permanentLoginUrl()
 {
+    getAppInfoFromSettings();
+
     QString str = QString("%1?client_id=%2&redirect_uri=%3&response_type=code&scope=%4&approval_prompt=force&access_type=offline").
             arg(m_strEndPoint,m_strClientID,m_strRedirectURI,m_strScope);
     return str;
@@ -63,9 +67,11 @@ bool OAuth2::isAuthorized()
 
 void OAuth2::startLogin(QWidget* parent, bool bForce)
 {
+    getAppInfoFromSettings();
+
     m_pParent = parent;
-    if(m_strClientID == "YOUR_CLIENT_ID_HERE" || m_strRedirectURI == "YOUR_REDIRECT_URI_HERE" ||
-        m_strClientSecret == "YOUR_CLIENT_SECRET_HERE")
+    if(m_strClientID.isEmpty() || m_strRedirectURI.isEmpty() ||
+        m_strClientSecret.isEmpty())
     {
         QMessageBox::warning(m_pParent, "Warning",
                              "To work with application you need to register your own application in <b>Google</b>.\n"
@@ -107,6 +113,9 @@ void OAuth2::accessTokenObtained()
  */
 void OAuth2::codeObtained()
 {
+    getAppInfoFromSettings();
+
+
     m_strCode = m_pLoginDialog->code();
 
     QUrl url("https://accounts.google.com/o/oauth2/token");
@@ -176,6 +185,8 @@ void OAuth2::replyFinished(QNetworkReply* reply)
 
 void OAuth2::getAccessTokenFromRefreshToken()
 {
+    getAppInfoFromSettings();
+
     QUrl url("https://accounts.google.com/o/oauth2/token");
     QNetworkRequest request;
     request.setUrl(url);
@@ -187,5 +198,15 @@ void OAuth2::getAccessTokenFromRefreshToken()
     params += "&refresh_token=" + m_strRefreshToken;
 
     m_pNetworkAccessManager->post(request, params.toLatin1());
+}
+
+void OAuth2::getAppInfoFromSettings()
+{
+    QSettings settings(COMPANY_NAME, APP_NAME);
+
+    m_strClientID = settings.value("CLIENT_ID",  "").toString();
+    m_strClientSecret = settings.value("CLIENT_SECRET", "").toString();
+    m_strRedirectURI = settings.value("REDIRECT_URI", "").toString();
+
 }
 

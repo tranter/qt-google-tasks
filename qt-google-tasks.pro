@@ -35,19 +35,23 @@ SOURCES += main.cpp\
     oauth2.cpp \
     logindialog.cpp \
     tasks_data_manager.cpp \
-    tree_widget.cpp
+    tree_widget.cpp \
+    settingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     form.h \
     oauth2.h \
     logindialog.h \
     tasks_data_manager.h \
-    tree_widget.h
+    tree_widget.h \
+    registration.h \
+    settingsdialog.h
 
 FORMS    += mainwindow.ui \
     form.ui \
     logindialog.ui \
-    item_widget.ui
+    item_widget.ui \
+    settingsdialog.ui
 
 RESOURCES += \
     resource.qrc

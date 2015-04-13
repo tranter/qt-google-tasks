@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "form.h"
+#include "settingsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -10,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionLogin, SIGNAL(triggered()), this, SLOT(startLogin()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
+    connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(settings()));
+
+
     m_pForm = new Form(this);
     setCentralWidget(m_pForm);
 }
@@ -17,6 +21,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::settings()
+{
+    SettingsDialog dlg(this);
+    dlg.exec();
 }
 
 void MainWindow::startLogin()
