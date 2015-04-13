@@ -4,6 +4,10 @@
 #define COMPANY_NAME "ICS"
 #define APP_NAME "QtTasks"
 
+#define CLIENT_ID_KEY "CLIENT_ID"
+#define CLIENT_SECRET_KEY "CLIENT_SECRET"
+#define REDIRECT_URI_KEY "REDIRECT_URI"
+
 
 #endif // REGISTRATION_H
 

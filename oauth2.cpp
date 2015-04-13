@@ -204,9 +204,9 @@ void OAuth2::getAppInfoFromSettings()
 {
     QSettings settings(COMPANY_NAME, APP_NAME);
 
-    m_strClientID = settings.value("CLIENT_ID",  "").toString();
-    m_strClientSecret = settings.value("CLIENT_SECRET", "").toString();
-    m_strRedirectURI = settings.value("REDIRECT_URI", "").toString();
+    m_strClientID = settings.value(CLIENT_ID_KEY,  "").toString();
+    m_strClientSecret = settings.value(CLIENT_SECRET_KEY, "").toString();
+    m_strRedirectURI = settings.value(REDIRECT_URI_KEY, "").toString();
 
 }
 
